@@ -1,0 +1,81 @@
+gcit@gcit-OptiPlex-3040:~/Desktop/Assignment 1_2 (1)/Assignment 1/bomb003$ chmod +x bomb     //if the permission is denied than we can change the access permission.
+gcit@gcit-OptiPlex-3040:~/Desktop/Assignment 1_2 (1)/Assignment 1/bomb003$ gdb bomb
+         //opening bomb in gdb.
+(gdb) b phase_1          //setting break point of phase_1
+Breakpoint 1 at 0x400e8d
+(gdb) r       //start the execution
+Starting program: /home/gcit/Desktop/Assignment 1_2 (1)/Assignment 1/bomb003/bomb 
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Hello              //A random string as answer.
+Breakpoint 1, 0x0000000000400e8d in phase_1 ()   // the break point stops user from further execution if the input is incorrect.
+(gdb) disas           //Disassemble current function
+Dump of assembler code for function phase_1:
+=> 0x0000000000400e8d <+0>:	sub    $0x8,%rsp         
+      0x0000000000400e91 <+4>:	mov    $0x4023b0,%esi
+      0x0000000000400e96 <+9>:	callq  0x40132b <strings_not_equal>
+      0x0000000000400e9b <+14>:	test   %eax,%eax
+      0x0000000000400e9d <+16>:	je     0x400ea4 <phase_1+23>
+      0x0000000000400e9f <+18>:	callq  0x40142a <explode_bomb>
+      0x0000000000400ea4 <+23>:	add    $0x8,%rsp
+      0x0000000000400ea8 <+27>:	retq   
+End of assembler dump.
+(gdb) ni         //next instruction
+0x0000000000400e91 in phase_1 ()
+(gdb) disas
+Dump of assembler code for  function phase_1:
+      0x0000000000400e8d <+0>:	sub    $0x8,%rsp
+=> 0x0000000000400e91 <+4>:	mov    $0x4023b0,%esi   //from the output is read by next line
+      0x0000000000400e96 <+9>:	callq  0x40132b <strings_not_equal>  
+      0x0000000000400e9b <+14>:	test   %eax,%eax
+      0x0000000000400e9d <+16>:	je     0x400ea4 <phase_1+23>
+      0x0000000000400e9f <+18>:	callq  0x40142a <explode_bomb>
+      0x0000000000400ea4 <+23>:	add    $0x8,%rsp
+      0x0000000000400ea8 <+27>:	retq   
+End of assembler dump.
+(gdb) ni
+0x0000000000400e96 in phase_1 ()
+(gdb) disas
+Dump of assembler code for function phase_1:
+   0x0000000000400e8d <+0>:	sub    $0x8,%rsp
+   0x0000000000400e91 <+4>:	mov    $0x4023b0,%esi
+=> 0x0000000000400e96 <+9>:	callq  0x40132b <strings_not_equal>   // this call function 								returns if the input we did is equal to this string.
+   0x0000000000400e9b <+14>:	test   %eax,%eax
+   0x0000000000400e9d <+16>:	je     0x400ea4 <phase_1+23>
+   0x0000000000400e9f <+18>:	callq  0x40142a <explode_bomb>
+   0x0000000000400ea4 <+23>:	add    $0x8,%rsp
+   0x0000000000400ea8 <+27>:	retq   
+End of assembler dump.
+(gdb) i r           //information register(information about the 16 registers in the 32-bit architecture)
+rax            0x6037a0            6305696
+rbx            0x4021e0            4202976
+rcx            0x9                 9
+rdx            0x6037a0            6305696
+rsi            0x4023b0            4203440             //this value is the output of the previous line so we have 						to find this value.
+rdi            0x6037a0            6305696
+rbp            0x0                 0x0
+rsp            0x7fffffffdd70      0x7fffffffdd70
+r8             0x6037a0            6305696
+r9             0x7c                124
+r10            0xfffffffffffff6ed  -2323
+r11            0x7ffff7df8400      140737352008704
+r12            0x400c60            4197472
+r13            0x7fffffffde70      140737488346736
+r14            0x0                 0
+r15            0x0                 0
+rip            0x400e96            0x400e96 <phase_1+9>
+eflags         0x202               [ IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+(gdb) x/s 4203440      // x/s prints the value in the form of string 
+0x4023b0:	"Border relations with Canada have never been better."     //this is the value of the line hence our input should be equal to this string. Now we have to check using this string.
+
+gcit@gcit-OptiPlex-3040:~/Desktop/Assignment 1_2 (1)/Assignment 1/bomb003$ ./bomb
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Border relations with Canada have never been better.        //using the output as input for phase_1
+Phase 1 defused. How about the next one?           // hence the answer is correct and we can proceed to next phase
