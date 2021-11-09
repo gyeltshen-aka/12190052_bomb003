@@ -1,0 +1,75 @@
+Note: I used GNU debugger which is a command line debugger tool available on virtually every platform.
+gdb - GNU debugger which is command line debugger tool
+
+*/In phase 4 we have to give two integer as inputs. Our inputs are being passed to a function (func4) from where we get our second value. Our first input should be between 1-14. This func4 basically does a binary search and sums up the numbers as the code excutes. 3 arguments are being passed to func4(%edx, %esi, %edi)./*
+
+Input: 3 2
+Code for Phase 4:
+   0x0000000000400ffa <+0>:	sub    $0x18,%rsp			//Creating a stack frame of 18 bytes
+   0x0000000000400ffe <+4>:	mov    %fs:0x28,%rax			//fs register used as base pointer address
+   0x0000000000401007 <+13>:	mov    %rax,0x8(%rsp)			//moving the result stored in %rax to stack frame
+   0x000000000040100c <+18>:	xor    %eax,%eax			//xor opertion(eax = 0)
+   0x000000000040100e <+20>:	lea    0x4(%rsp),%rcx			//Our second value in %rcx
+   0x0000000000401013 <+25>:	mov    %rsp,%rdx			//Our first value in %rdx
+   0x0000000000401016 <+28>:	mov    $0x4025af,%esi			// Our input format (%d %d)
+   0x000000000040101b <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>	//Getting user input number
+   0x0000000000401020 <+38>:	cmp    $0x2,%eax			//comparing value stored at %eax with 2
+   0x0000000000401023 <+41>:	jne    0x40102b <phase_4+49>		//jump-not-equal (if not equal explod bomb)
+   0x0000000000401025 <+43>:	cmpl   $0xe,(%rsp)			//$0xe = 14 (comparing 14 with our first input)
+   0x0000000000401029 <+47>:	jbe    0x401030 <phase_4+54>		//jump-below-equal (if our first input is equal or less than 14 jump to line 54)
+   0x000000000040102b <+49>:	callq  0x40142a <explode_bomb>
+   0x0000000000401030 <+54>:	mov    $0xe,%edx			//$0xe = 14(move 14 to %edx)
+   0x0000000000401035 <+59>:	mov    $0x0,%esi			//$0x0 = 0(move 0 to %esi)
+   0x000000000040103a <+64>:	mov    (%rsp),%edi			//move our first input to %edi
+   0x000000000040103d <+67>:	callq  0x400fbc <func4>		//Calling function func4
+   0x0000000000401042 <+72>:	cmp    $0x2,%eax			//%eax holds the value returned from func4 and is being compared with 2
+   0x0000000000401045 <+75>:	jne    0x40104e <phase_4+84>		//if 2 and %eax are not eqeual explode bomb
+   0x0000000000401047 <+77>:	cmpl   $0x2,0x4(%rsp)			//compare 2 with our second value
+   0x000000000040104c <+82>:	je     0x401053 <phase_4+89>		//jump to line 89 if they are equal
+   0x000000000040104e <+84>:	callq  0x40142a <explode_bomb>
+   0x0000000000401053 <+89>:	mov    0x8(%rsp),%rax			
+   0x0000000000401058 <+94>:	xor    %fs:0x28,%rax
+   0x0000000000401061 <+103>:	je     0x401068 <phase_4+110>
+   0x0000000000401063 <+105>:	callq  0x400b00 <__stack_chk_fail@plt>
+   0x0000000000401068 <+110>:	add    $0x18,%rsp			//closing the stack frame
+   0x000000000040106c <+114>:	retq  
+   
+   values passed to func4 are edx = 14, esi = 0 and edi = 3
+Code for func4:
+   0x0000000000400fbc <+0>:	sub    $0x8,%rsp  		//creating a stack frame of 8 bytes
+   0x0000000000400fc0 <+4>:	mov    %edx,%eax  		//move the value of %edx to %eax
+   0x0000000000400fc2 <+6>:	sub    %esi,%eax		//subtract %esi from %eax
+   0x0000000000400fc4 <+8>:	mov    %eax,%ecx		//move the value of %eax to %ecx
+   0x0000000000400fc6 <+10>:	shr    $0x1f,%ecx		//perform logical right shift ($0x1f = 31) (14 >> 31 = 0 = %ecx)
+   0x0000000000400fc9 <+13>:	add    %ecx,%eax		//%ecx = 0 and %eax = 14 (14+0 = 14 = %eax)
+   0x0000000000400fcb <+15>:	sar    %eax			//arithmetic right shif of %eax(14 >> 1 which is same as %eax/2 or 14/2 = 7 = %eax)
+   0x0000000000400fcd <+17>:	lea    (%rax,%rsi,1),%ecx	//%rax = 7 and %rsi = 0 (7+0 = 7 = %ecx)
+   0x0000000000400fd0 <+20>:	cmp    %edi,%ecx		//compare first input(3) with %ecx(7)
+   0x0000000000400fd2 <+22>:	jle    0x400fe0 <func4+36>	//jump-less-equal(if %ecx is less or equal to %edi jump to line 36)
+   0x0000000000400fd4 <+24>:	lea    -0x1(%rcx),%edx		//%rcx = 7 (7-1 = 6 = %edx)
+   0x0000000000400fd7 <+27>:	callq  0x400fbc <func4>	//recursively calling func4
+   0x0000000000400fdc <+32>:	add    %eax,%eax		//adding the values returned by func4(second call)
+   0x0000000000400fde <+34>:	jmp    0x400ff5 <func4+57>	//jump to line 57
+   0x0000000000400fe0 <+36>:	mov    $0x0,%eax		//eax = 0
+   0x0000000000400fe5 <+41>:	cmp    %edi,%ecx		//compare the value at %edi and %ecx
+   0x0000000000400fe7 <+43>:	jge    0x400ff5 <func4+57>	//jump to line 57
+   0x0000000000400fe9 <+45>:	lea    0x1(%rcx),%esi		//%rcx + 1 (incrementing %rcx in every function call)
+   0x0000000000400fec <+48>:	callq  0x400fbc <func4>	//calling function 4 again
+   0x0000000000400ff1 <+53>:	lea    0x1(%rax,%rax,1),%eax
+   0x0000000000400ff5 <+57>:	add    $0x8,%rsp		
+   0x0000000000400ff9 <+61>:	retq 				//return the value(second value)
+
+Breakpoint 1, 0x0000000000400ffa in phase_4 ()
+(gdb) delete break
+Delete all breakpoints? (y or n) y
+(gdb) run answers.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /home/cheki/Documents/GCIT/5th Semester/Computer System 1/Assignment 1_2/Assignment 1/bomb003/bomb answers.txt
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Phase 1 defused. How about the next one?
+That's number 2.  Keep going!
+Halfway there!
+4 2
+So you got that one.  Try this one.
