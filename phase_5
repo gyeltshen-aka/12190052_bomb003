@@ -1,0 +1,54 @@
+Note: I used GNU debugger which is a command line debugger tool available on virtually every platform.
+gdb - GNU debugger which is command line debugger tool
+/*Two inputs are entered. To get the first value, the first input is compared with 15 and based on the first input it loops in the code till the value generates 15. After that it jumps out of the loop and compares the generated value with 15. From here we get the first value which is 5. Based on the first value second value is calculated and then generated which is 115. */
+
+Code for Phase_5
+0x000000000040106d <+0>:	sub    $0x18,%rsp				//Stack frame of 18 bytes
+   0x0000000000401071 <+4>:	mov    %fs:0x28,%rax				//fs register used as base pointer address
+   0x000000000040107a <+13>:	mov    %rax,0x8(%rsp)				//moving the result stored in %rax to stack frame
+   0x000000000040107f <+18>:	xor    %eax,%eax				//xor opertion(eax = 0)
+   0x0000000000401081 <+20>:	lea    0x4(%rsp),%rcx				//Our second value in %rcx
+   0x0000000000401086 <+25>:	mov    %rsp,%rdx				//Our first value in %rdx
+   0x0000000000401089 <+28>:	mov    $0x4025af,%esi				// Our input format (%d %d)
+   0x000000000040108e <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>		//Getting user input number
+   0x0000000000401093 <+38>:	cmp    $0x1,%eax				//compare 1 with the values stored in %eax(2)
+   0x0000000000401096 <+41>:	jg     0x40109d <phase_5+48>			// jump-greater (The value stored in the %eax(2) is compared with 1.)
+   0x0000000000401098 <+43>:	callq  0x40142a <explode_bomb>			//If %eax is greater than 1 it jumps to next instruction else the bomp explodes.
+   0x000000000040109d <+48>:	mov    (%rsp),%eax				//%rsp(first input) 5 moved to %eax
+   0x00000000004010a0 <+51>:	and    $0xf,%eax				//perform & operation (0xf (1111) AND 0001 = 0001 (1))
+   0x00000000004010a3 <+54>:	mov    %eax,(%rsp)				//move 5 to (%rsp)
+   0x00000000004010a6 <+57>:	cmp    $0xf,%eax				//0xf (15) is compared with the values stored in %eax (5)
+   0x00000000004010a9 <+60>:	je     0x4010da <phase_5+109>			//jump-equal (if equal jump to line 109)
+=> 0x00000000004010ab <+62>:	mov    $0x0,%ecx				//%ecx = 0
+   0x00000000004010b0 <+67>:	mov    $0x0,%edx				//%edx = 0
+   0x00000000004010b5 <+72>:	add    $0x1,%edx				//add 0 + 1 = 1(%edx)
+   0x00000000004010b8 <+75>:	cltq						// specialized movs that operates %rax and does sign extension in place on %rax
+   0x00000000004010ba <+77>:	mov    0x402460(,%rax,4),%eax			//generates random values from the array and store at %eax
+   0x00000000004010c1 <+84>:	add    %eax,%ecx				//adds the value at %eax and %ecx 
+   0x00000000004010c3 <+86>:	cmp    $0xf,%eax				//compares the value at %ecx with 15
+   0x00000000004010c6 <+89>:	jne    0x4010b5 <phase_5+72>			//ADD operation performed. %eax= 12, %ecx = 0. 12 + 0 = 12 -> stored in %ecx and 										      compares the value stored in %eax (12) and 0xf(15).It loops till the value becomes 15 
+
+   0x00000000004010c8 <+91>:	movl   $0xf,(%rsp)				//15 is moved to (%rsp)
+   0x00000000004010cf <+98>:	cmp    $0xf,%edx				//compares 15 with %edx
+   0x00000000004010d2 <+101>:	jne    0x4010da <phase_5+109>			// The value stored in the %edx is compared with 15. If the values are equla it 											jumps to next instruction else it calls explode bomb function. From here we can 											confirm the first input which is 5.
+   
+   0x00000000004010d4 <+103>:	cmp    0x4(%rsp),%ecx				//compares our second value with %ecx 
+   0x00000000004010d8 <+107>:	je     0x4010df <phase_5+114>		        //If the values are equal it jumps to the next instruction else it calls explode 											bomb function. From here the second value is confirmed.	
+   0x00000000004010da <+109>:	callq  0x40142a <explode_bomb>
+   0x00000000004010df <+114>:	mov    0x8(%rsp),%rax
+   0x00000000004010e4 <+119>:	xor    %fs:0x28,%rax
+   0x00000000004010ed <+128>:	je     0x4010f4 <phase_5+135>
+   0x00000000004010ef <+130>:	callq  0x400b00 <__stack_chk_fail@plt>
+   0x00000000004010f4 <+135>:	add    $0x18,%rsp
+   0x00000000004010f8 <+139>:	retq     			
+   	              				
+
+Output
+5 115
+Good work!  On to the next...
+
+main (argc=<optimized out>, argv=<optimized out>) at bomb.c:102
+102	    phase_defused();
+
+
+
